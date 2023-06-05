@@ -18,8 +18,9 @@ class Pause:
 
     async def main(self):
         while True:
-            k_press = win32api.GetKeyState(0x4B)
             await asyncio.sleep(1)
+
+            k_press = win32api.GetKeyState(0x4B)
             if k_press == 0:
                 self.state = LogicStatusPause.OFF
             elif k_press == 1:

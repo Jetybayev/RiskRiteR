@@ -62,6 +62,8 @@ class ExtractionState:
 
 
 class LogicExtraction:
+    new_akk = None
+
     connection_lost_target = []
 
     state = None
@@ -96,8 +98,9 @@ class LogicExtraction:
     border_pixels = 2
     titlebar_pixels = 30
 
-    def __init__(self):
+    def __init__(self, new_akk=False):
         self.state = ExtractionState.START_INITIALIZING
+        self.new_akk = new_akk
 
     def get_screen_position(self, pos):
         x = pos[0] + self.window_position[0] + self.border_pixels
@@ -142,8 +145,26 @@ class LogicExtraction:
         pag.keyUp('alt')
         await asyncio.sleep(random.uniform(0.5, 0.8))
 
-    async def select_chat_local(self):
-        MouseUtils.move_to(self.get_screen_position((115, 785)), 15, 2)
+    async def select_corp_chat(self):
+
+        if self.new_akk:
+            MouseUtils.move_to(self.get_screen_position((205, 785)), 4, 3)
+            await asyncio.sleep(random.uniform(0.3, 0.6))
+
+            pag.mouseDown((pag.position()), button='left')
+            await asyncio.sleep(random.uniform(0.175, 0.275))
+            pag.mouseUp((pag.position()), button='left')
+            await asyncio.sleep(random.uniform(0.5, 0.8))
+
+        MouseUtils.move_to(self.get_screen_position((448, 782)), 2, 3)
+        await asyncio.sleep(random.uniform(0.3, 0.6))
+
+        pag.mouseDown((pag.position()), button='left')
+        await asyncio.sleep(random.uniform(0.175, 0.275))
+        pag.mouseUp((pag.position()), button='left')
+        await asyncio.sleep(random.uniform(0.5, 0.8))
+
+        MouseUtils.move_to(self.get_screen_position((550, 992)), 20, 2)
         await asyncio.sleep(random.uniform(0.3, 0.6))
 
         pag.mouseDown((pag.position()), button='left')
@@ -599,8 +620,12 @@ class LogicExtraction:
 
     async def main(self):
         if self.state == ExtractionState.START_INITIALIZING:
-            task = asyncio.create_task(self.on_off_graphics())
-            await task
+            task_1 = asyncio.create_task(self.on_off_graphics())
+            await task_1
+            task_2 = asyncio.create_task(self.select_corp_chat())
+            await task_2
+            task_3 = asyncio.create_task(self.move_to_side_nearby_overview(click=True))
+            await task_3
             self.state = ExtractionState.SCAN_STATION_OR_SPACE
 
         elif self.state == ExtractionState.SCAN_STATION_OR_SPACE:
@@ -611,7 +636,6 @@ class LogicExtraction:
                 self.state = ExtractionState.SCAN_LOCATION_IN_SPACE
 
         elif self.state == ExtractionState.SHIP_IN_STATION:
-            print('self.state == ExtractionState.SHIP_IN_STATION', self.work_time_finish)
             if self.work_time_finish is True:
                 self.state = ExtractionState.TIMER_PAUSE
             else:
@@ -648,16 +672,12 @@ class LogicExtraction:
             await asyncio.sleep(random.uniform(10, 15))
             self.state = ExtractionState.SHIP_IN_SPACE
 
-        elif self.state == ExtractionState.SHIP_IN_SPACE:
+        elif self.state == ExtractionState.SHIP_IN_SPACE:  # !!!!!!!!!!!!!!!!!!!!!
             task_1 = asyncio.create_task(self.shield_on_off())
             await task_1
             if self.ship_in_space:
-                task_1 = asyncio.create_task(self.select_chat_local())
-                await task_1
-                task_2 = asyncio.create_task(self.move_to_side_nearby_overview(click=True))
+                task_2 = asyncio.create_task(self.scroll_distance())
                 await task_2
-                task_3 = asyncio.create_task(self.scroll_distance())
-                await task_3
                 self.ship_in_space = False
             self.state = ExtractionState.SCAN_LOCATION_IN_SPACE
 

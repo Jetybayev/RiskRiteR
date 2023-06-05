@@ -4,3 +4,4 @@ venv/
 __pycache__/
 templates/
 .env
+send_chat_activ.png

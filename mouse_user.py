@@ -1,4 +1,4 @@
-import random
+from random import choice, randrange, randint
 import pytweening
 import numpy as np
 import pyautogui as pag
@@ -8,6 +8,20 @@ from pyclick import HumanCurve
 class MouseUtils:
     @staticmethod
     def move_to(destination: tuple, dest_var_x=0, dest_var_y=0, **kwargs):
+
+        if dest_var_x > 0:
+            dest_x = destination[0] + randrange(-dest_var_x, dest_var_x)
+            dest_y = destination[1]
+        elif dest_var_y > 0:
+            dest_x = destination[0]
+            dest_y = destination[1] + randrange(-dest_var_y, dest_var_y)
+        elif dest_var_x > 0 and dest_var_y > 0:
+            dest_x = destination[0] + randrange(-dest_var_x, dest_var_x)
+            dest_y = destination[1] + randrange(-dest_var_y, dest_var_y)
+        else:
+            dest_x = destination[0]
+            dest_y = destination[1]
+
         # sourcery skip: use-contextlib-suppress
         """
         Use Bezier curve to simulate human-like mouse movements.
@@ -31,21 +45,8 @@ class MouseUtils:
         distortion_frequency = kwargs.get("distortionFrequency", 0.5)
         tween = kwargs.get("tweening", pytweening.easeOutQuad)
         mouse_speed_list = ['slowest', 'slow', 'medium', 'fast', 'fastest']
-        mouse_speed = kwargs.get("mouseSpeed", f"{random.choice(mouse_speed_list)}")
+        mouse_speed = kwargs.get("mouseSpeed", f"{choice(mouse_speed_list)}")
         mouse_speed = MouseUtils.__get_mouse_speed(mouse_speed)
-
-        if dest_var_x > 0:
-            dest_x = destination[0] + random.randrange(-dest_var_x, dest_var_x)
-            dest_y = destination[1]
-        elif dest_var_y > 0:
-            dest_x = destination[0]
-            dest_y = destination[1] + random.randrange(-dest_var_y, dest_var_y)
-        elif dest_var_x > 0 and dest_var_y > 0:
-            dest_x = destination[0] + random.randrange(-dest_var_x, dest_var_x)
-            dest_y = destination[1] + random.randrange(-dest_var_y, dest_var_y)
-        else:
-            dest_x = destination[0]
-            dest_y = destination[1]
 
         start_x, start_y = pag.position()
         for curve_x, curve_y in HumanCurve(
@@ -81,6 +82,7 @@ class MouseUtils:
             y += np.random.randint(-y_var, y_var)
         self.move_to((pag.position()[0] + x, pag.position()[1] + y), **kwargs)
 
+    @staticmethod
     def __calculate_knots(destination: tuple):
         """
         Calculate the knots to use in the Bezier curve based on distance.
@@ -92,20 +94,21 @@ class MouseUtils:
         res = round(distance / 200)
         return min(res, 3)
 
+    @staticmethod
     def __get_mouse_speed(speed: str) -> int:
         """
         Converts a text speed to a numeric speed for HumanCurve (targetPoints).
         """
         if speed == "slowest":
-            return random.randint(120, 145)  # (85, 100)
+            return randint(120, 145)  # (85, 100)
         elif speed == "slow":
-            return random.randint(100, 125)  # (65, 80)
+            return randint(100, 125)  # (65, 80)
         elif speed == "medium":
-            return random.randint(80, 105)  # (45, 60)
+            return randint(80, 105)  # (45, 60)
         elif speed == "fast":
-            return random.randint(60, 85)  # (20, 40)
+            return randint(60, 85)  # (20, 40)
         elif speed == "fastest":
-            return random.randint(40, 65)  # (10, 15)
+            return randint(40, 65)  # (10, 15)
         else:
             raise ValueError("Invalid mouse speed. Try 'slowest', 'slow', 'medium', 'fast', or 'fastest'.")
 

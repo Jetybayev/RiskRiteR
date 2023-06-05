@@ -12,6 +12,7 @@ from logic_custom_win import LogicPositioning, LogicState
 from pause import Pause, LogicStatusPause
 from logic_extraction import LogicExtraction, ExtractionState
 from start_timer import TimerWork, TimeState
+from telegram import IodineTelegram
 
 
 class MainProgram:
@@ -20,7 +21,7 @@ class MainProgram:
     win_detect = None
 
     START_MODE = True
-    DEBUG = False
+    DEBUG = True
 
     def __init__(self, window_name):
         self.window_name = window_name
@@ -260,6 +261,7 @@ class MainProgram:
                     self.win_detect = WindowCapture(self.windows[2])
                     extraction_mode.update_pos_win(self.win_detect.window_rect)
                     ocr_logic.update_win_pos(self.win_detect.window_rect)
+                    tm_iodine.update_pos_win(self.win_detect.window_rect)
 
                     while True:
                         await asyncio.sleep(0.1)
@@ -674,10 +676,12 @@ class MainProgram:
 if __name__ == '__main__':
     load_dotenv(find_dotenv())
     main_con_log = MainProgram(os.getenv('name_char'))
+    tm_iodine = IodineTelegram(os.getenv('token_tg_bot'), os.getenv('chat_id_tg_bot'), os.getenv('name_char'))
 
     vision = Vision()
     ocr_logic = Ocr()
     pause = Pause()
+
     timer = TimerWork(
         list(map(int, os.getenv('timer_1').split(','))),
         list(map(int, os.getenv('timer_2').split(','))),
@@ -690,14 +694,16 @@ if __name__ == '__main__':
     MODE = ProgramMode(int(os.getenv('activ_mode')))
     start_mode = LoginPositioning()
     custom_win_mode = LogicPositioning()
-    extraction_mode = LogicExtraction()
+    extraction_mode = LogicExtraction(os.getenv('new_akk'))
 
     async def main():
         task_main = asyncio.create_task(main_con_log.main_connecting_logic())
         task_timer = asyncio.create_task(timer.main())
         task_pause = asyncio.create_task(pause.main())
+        task_telegram = asyncio.create_task(tm_iodine.main())
         await task_main
         await task_timer
         await task_pause
+        await task_telegram
 
     asyncio.run(main())
