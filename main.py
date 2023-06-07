@@ -1,18 +1,22 @@
 import asyncio
 
 import os
-from dotenv import load_dotenv, find_dotenv
+import win32api
 import cv2 as cv
 from ocr import Ocr
 from vision import Vision
-from win_cap_detect import WindowCapture
+from telegram import IodineTelegram
 from modes import Modes, ProgramMode
+from win_cap_detect import WindowCapture
+from pause import Pause, LogicStatusPause
+from dotenv import load_dotenv
+from start_timer import TimerWork, TimeState
 from logic_start import LoginPositioning, LogicLogin
 from logic_custom_win import LogicPositioning, LogicState
-from pause import Pause, LogicStatusPause
 from logic_extraction import LogicExtraction, ExtractionState
-from start_timer import TimerWork, TimeState
-from telegram import IodineTelegram
+
+
+# pyinstaller --clean -n Iodine -i "D:\My_programming_projects\Iodine\Iodine.ico" main.py
 
 
 class MainProgram:
@@ -21,7 +25,7 @@ class MainProgram:
     win_detect = None
 
     START_MODE = True
-    DEBUG = True
+    DEBUG = False
 
     def __init__(self, window_name):
         self.window_name = window_name
@@ -29,21 +33,36 @@ class MainProgram:
         self.win_detect = WindowCapture(None)
 
     async def main_connecting_logic(self):
-        await asyncio.sleep(5)
+        await asyncio.sleep(10)
         while True:
             await asyncio.sleep(1)
+
+            j_press = win32api.GetKeyState(0x4A)
+            if j_press == 0:
+                pass
+            elif j_press == 1:
+                print('break general cycle')
+                break
+            else:
+                pass
 
             if timer.state == TimeState.PAUSE:
                 continue
 
             if timer.until_timer_end is not None and timer.until_timer_end < 1500:
+                print('Not enough time to fly')
                 continue
 
             if pause.state == LogicStatusPause.ON:
+                if tm_iodine.pause is True:
+                    pause.telegram_pause = True
                 continue
             else:
+                tm_iodine.pause = False
+                pause.telegram_pause = None
 
                 if self.START_MODE:
+                    print('run START_MODE')
                     self.win_detect = WindowCapture(self.windows[0])
                     start_mode.update_pos_win(self.win_detect.window_rect)
 
@@ -139,6 +158,8 @@ class MainProgram:
                             self.START_MODE = False
                             break
 
+                        print('status', start_mode.state)
+
                         if self.win_detect.screenshot is None:
                             continue
 
@@ -154,6 +175,7 @@ class MainProgram:
                 # Мод настройки позиций окон___________________________________________________________________________
 
                 if MODE.state == Modes.CUSTOM_WINDOWS:
+                    print('run CUSTOM_WINDOWS')
                     self.win_detect = WindowCapture(self.windows[2])
                     custom_win_mode.update_pos_win(self.win_detect.window_rect)
 
@@ -243,6 +265,8 @@ class MainProgram:
                             cv.destroyAllWindows()
                             break
 
+                        print('status', custom_win_mode.state)
+
                         if self.win_detect.screenshot is None:
                             continue
 
@@ -258,6 +282,7 @@ class MainProgram:
                 # Мод добычи астероидов на Venture в hi-sec____________________________________________________________
 
                 elif MODE.state == Modes.MINING_PROJECT_GREEN:
+                    print('run MINING_PROJECT_GREEN')
                     self.win_detect = WindowCapture(self.windows[2])
                     extraction_mode.update_pos_win(self.win_detect.window_rect)
                     ocr_logic.update_win_pos(self.win_detect.window_rect)
@@ -265,11 +290,21 @@ class MainProgram:
 
                     while True:
                         await asyncio.sleep(0.1)
+
+                        j_press = win32api.GetKeyState(0x4A)
+                        if j_press == 0:
+                            pass
+                        elif j_press == 1:
+                            break
+                        else:
+                            pass
+
                         if pause.state == LogicStatusPause.ON:
                             break
 
                         if timer.state == TimeState.START:
                             if timer.until_timer_end is not None and timer.until_timer_end < 1500:
+                                print('Not enough time to fly')
                                 extraction_mode.work_time_finish = True
 
                         if extraction_mode.state == ExtractionState.START_INITIALIZING:
@@ -394,6 +429,7 @@ class MainProgram:
                             await task_2
 
                         elif extraction_mode.state == ExtractionState.DOCKING:
+                            tm_iodine.flag_docking = True
                             task = asyncio.create_task(extraction_mode.main())
                             await task
 
@@ -660,6 +696,8 @@ class MainProgram:
                             self.START_MODE = True
                             break
 
+                        print('status', extraction_mode.state)
+
                         if self.win_detect.screenshot is None:
                             continue
 
@@ -674,9 +712,13 @@ class MainProgram:
 
 
 if __name__ == '__main__':
-    load_dotenv(find_dotenv())
+    load_dotenv(os.path.join(os.getcwd(), 'env', '.env'))
     main_con_log = MainProgram(os.getenv('name_char'))
-    tm_iodine = IodineTelegram(os.getenv('token_tg_bot'), os.getenv('chat_id_tg_bot'), os.getenv('name_char'))
+    tm_iodine = IodineTelegram(
+        os.getenv('token_tg_bot'),
+        os.getenv('chat_id_tg_bot'),
+        os.getenv('name_char')
+    )
 
     vision = Vision()
     ocr_logic = Ocr()

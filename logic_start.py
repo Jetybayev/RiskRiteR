@@ -7,21 +7,21 @@ from mouse_user import MouseUtils
 
 class LogicLogin:
 
-    SCAN_START_LAUNCHER = 0
-    START_LAUNCHER = 1
-    SCAN_START_GAME = 2
-    START_GAME = 3
-    SCAN_LOCK_LAUNCHER = 4
-    LOCK_LAUNCHER = 5
-    STOP_LAUNCH = 6
+    SCAN_START_LAUNCHER = 'SCAN_START_LAUNCHER'
+    START_LAUNCHER = 'START_LAUNCHER'
+    SCAN_START_GAME = 'SCAN_START_GAME'
+    START_GAME = 'START_GAME'
+    SCAN_LOCK_LAUNCHER = 'SCAN_LOCK_LAUNCHER'
+    LOCK_LAUNCHER = 'LOCK_LAUNCHER'
+    STOP_LAUNCH = 'STOP_LAUNCH'
 
-    SCAN_DETECT_GIFT = 7
-    LOCK_GIFT = 8
-    CHECK_FALSE_GIFT = 9
-    FINISH_LOCK_GIFT = 10
-    ESC_SETTINGS_GRAPHICS = 11
-    START_CHAR_MAIN = 12
-    STOP = 13
+    SCAN_DETECT_GIFT = 'SCAN_DETECT_GIFT'
+    LOCK_GIFT = 'LOCK_GIFT'
+    CHECK_FALSE_GIFT = 'CHECK_FALSE_GIFT'
+    FINISH_LOCK_GIFT = 'FINISH_LOCK_GIFT'
+    ESC_SETTINGS_GRAPHICS = 'ESC_SETTINGS_GRAPHICS'
+    START_CHAR_MAIN = 'START_CHAR_MAIN'
+    STOP = 'STOP'
 
 
 class LoginPositioning:
@@ -72,7 +72,8 @@ class LoginPositioning:
         pag.mouseUp((pag.position()), button='left')
         await asyncio.sleep(random.uniform(0.3, 0.6))
 
-    async def lock_launcher(self):
+        await asyncio.sleep(random.uniform(15, 20))
+
         pag.keyDown('alt')
         await asyncio.sleep(random.uniform(0.4, 0.7))
         pag.keyDown('tab')
@@ -82,6 +83,7 @@ class LoginPositioning:
         pag.keyUp('alt')
         await asyncio.sleep(random.uniform(0.3, 0.6))
 
+    async def lock_launcher(self):
         MouseUtils.move_to(self.get_screen_position((self.targets[0][0] + 32, self.targets[0][1])), 0, 0)
         await asyncio.sleep(random.uniform(0.3, 0.6))
 
@@ -141,7 +143,6 @@ class LoginPositioning:
         elif self.state == LogicLogin.START_GAME:
             task = asyncio.create_task(self.start_game())
             await task
-            await asyncio.sleep(random.uniform(15, 20))
             self.state = LogicLogin.SCAN_LOCK_LAUNCHER
 
         elif self.state == LogicLogin.SCAN_LOCK_LAUNCHER:

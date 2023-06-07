@@ -3,5 +3,8 @@ venv/
 .idea/
 __pycache__/
 templates/
-.env
+env/
 send_chat_activ.png
+Iodine.spec
+dist/
+build/

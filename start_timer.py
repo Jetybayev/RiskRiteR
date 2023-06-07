@@ -1,7 +1,7 @@
 import asyncio
 
-from time import localtime, time
 from random import randint
+from time import localtime, time
 
 
 class TimeState:
@@ -180,6 +180,7 @@ class TimerWork:
 
             if self.state == TimeState.PAUSE:
                 while True:
+                    print('run TimeState.PAUSE')
                     self.local_time.clear()
                     self.local_time = [localtime()[_] for _ in range(9) if _ == 3 or _ == 4]
 

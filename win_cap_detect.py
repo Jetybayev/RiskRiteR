@@ -1,10 +1,10 @@
 import asyncio
 
 import mss
+import ctypes
+import win32gui
 import cv2 as cv
 import numpy as np
-import win32gui
-import ctypes
 from ctypes.wintypes import HWND, DWORD, RECT
 
 

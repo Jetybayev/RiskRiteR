@@ -1,11 +1,11 @@
 import asyncio
 
 import mss
+import win32api
+import requests
 import cv2 as cv
 import numpy as np
-import requests
 import pyautogui as pag
-import win32api
 from random import uniform
 
 
@@ -22,6 +22,8 @@ class TelegramPause:
 class IodineTelegram:
 
     state = None
+    flag_docking = False
+    pause = False
 
     screenshot = None
     window_position = None
@@ -122,3 +124,8 @@ class IodineTelegram:
                         await task_3
                         task_4 = asyncio.create_task(self.pause_on_off())
                         await task_4
+                        self.pause = True
+
+            if self.flag_docking:
+                await asyncio.sleep(60)
+                self.flag_docking = False

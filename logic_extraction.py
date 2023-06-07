@@ -6,59 +6,59 @@ from mouse_user import MouseUtils
 
 
 class ExtractionState:
-    START_INITIALIZING = 0
-    SCAN_STATION_OR_SPACE = 1
+    START_INITIALIZING = 'START_INITIALIZING'
+    SCAN_STATION_OR_SPACE = 'SCAN_STATION_OR_SPACE'
 
-    SHIP_IN_STATION = 2
-    SCAN_STORAGE_AT_STATION = 3
-    SCAN_FULL_ORE_HOLD_AT_STATION = 4
-    UNDOCK = 5
+    SHIP_IN_STATION = 'SHIP_IN_STATION'
+    SCAN_STORAGE_AT_STATION = 'SCAN_STORAGE_AT_STATION'
+    SCAN_FULL_ORE_HOLD_AT_STATION = 'SCAN_FULL_ORE_HOLD_AT_STATION'
+    UNDOCK = 'UNDOCK'
 
-    SHIP_IN_SPACE = 6
-    SCAN_LOCATION_IN_SPACE = 7
-    DETERMINATION_LOCATION_SHIP = 8
+    SHIP_IN_SPACE = 'SHIP_IN_SPACE'
+    SCAN_LOCATION_IN_SPACE = 'SCAN_LOCATION_IN_SPACE'
+    DETERMINATION_LOCATION_SHIP = 'DETERMINATION_LOCATION_SHIP'
 
-    SCAN_STORAGE_IN_SPACE = 9
-    SCAN_FULL_ORE_HOLD_IN_SPACE = 10
-    SCAN_LOCAL_COORDINATES = 11
+    SCAN_STORAGE_IN_SPACE = 'SCAN_STORAGE_IN_SPACE'
+    SCAN_FULL_ORE_HOLD_IN_SPACE = 'SCAN_FULL_ORE_HOLD_IN_SPACE'
+    SCAN_LOCAL_COORDINATES = 'SCAN_LOCAL_COORDINATES'
 
-    SCAN_BOOKMARKS_DOCK_TO_STATION = 12
-    GO_TO_STATION = 13
-    DOCKING = 14
+    SCAN_BOOKMARKS_DOCK_TO_STATION = 'SCAN_BOOKMARKS_DOCK_TO_STATION'
+    GO_TO_STATION = 'GO_TO_STATION'
+    DOCKING = 'DOCKING'
 
-    SCAN_BOOKMARKS_TO_ASTEROIDS = 15
-    GO_TO_BOOKMARKS_TO_ASTEROIDS = 16
+    SCAN_BOOKMARKS_TO_ASTEROIDS = 'SCAN_BOOKMARKS_TO_ASTEROIDS'
+    GO_TO_BOOKMARKS_TO_ASTEROIDS = 'GO_TO_BOOKMARKS_TO_ASTEROIDS'
 
-    MENU_BELT_SYSTEM = 17
-    SCAN_BELT_SYSTEM = 18
-    SELECT_BELT = 19
+    MENU_BELT_SYSTEM = 'MENU_BELT_SYSTEM'
+    SCAN_BELT_SYSTEM = 'SCAN_BELT_SYSTEM'
+    SELECT_BELT = 'SELECT_BELT'
 
-    GO_TO_WARP_DRIVE = 20
-    WARP_DRIVE = 21
+    GO_TO_WARP_DRIVE = 'GO_TO_WARP_DRIVE'
+    WARP_DRIVE = 'WARP_DRIVE'
 
-    SCAN_ASTEROIDS = 22
-    SCAN_DISTANCE_TO_ASTEROIDS = 23
-    MOVEMENT_TO_ASTEROIDS = 24
-    START_EXTRACT = 25
-    SCAN_EXTRACT = 26
-    SCAN_SHIELD_STATUS = 27
-    READINESS_SHIP = 28
+    SCAN_ASTEROIDS = 'SCAN_ASTEROIDS'
+    SCAN_DISTANCE_TO_ASTEROIDS = 'SCAN_DISTANCE_TO_ASTEROIDS'
+    MOVEMENT_TO_ASTEROIDS = 'MOVEMENT_TO_ASTEROIDS'
+    START_EXTRACT = 'START_EXTRACT'
+    SCAN_EXTRACT = 'SCAN_EXTRACT'
+    SCAN_SHIELD_STATUS = 'SCAN_SHIELD_STATUS'
+    READINESS_SHIP = 'READINESS_SHIP'
 
-    SCAN_ASTEROIDS_FOR_SAVE_BOOKMARKS = 29
-    SAVE_BOOKMARKS_ASTEROIDS = 30
+    SCAN_ASTEROIDS_FOR_SAVE_BOOKMARKS = 'SCAN_ASTEROIDS_FOR_SAVE_BOOKMARKS'
+    SAVE_BOOKMARKS_ASTEROIDS = 'SAVE_BOOKMARKS_ASTEROIDS'
 
-    SCAN_NPC_IN_OVERVIEW = 31
-    SCAN_DISTANCE_NPC = 32
-    LOCK_NPC = 33
-    SCAN_SHIP_PRIME_LOCK_AND_SELECTED = 34
-    SCAN_SHIP_LOCK_AND_SELECTED = 35
-    SCAN_SHIP_LOCK = 36
-    KILL_NPC = 37
-    SCAN_KILL_NPC = 38
+    SCAN_NPC_IN_OVERVIEW = 'SCAN_NPC_IN_OVERVIEW'
+    SCAN_DISTANCE_NPC = 'SCAN_DISTANCE_NPC'
+    LOCK_NPC = 'LOCK_NPC'
+    SCAN_SHIP_PRIME_LOCK_AND_SELECTED = 'SCAN_SHIP_PRIME_LOCK_AND_SELECTED'
+    SCAN_SHIP_LOCK_AND_SELECTED = 'SCAN_SHIP_LOCK_AND_SELECTED'
+    SCAN_SHIP_LOCK = 'SCAN_SHIP_LOCK'
+    KILL_NPC = 'KILL_NPC'
+    SCAN_KILL_NPC = 'SCAN_KILL_NPC'
 
-    TIMER_PAUSE = 39
-    CONNECTION_LOST = 40
-    STOP = 41
+    TIMER_PAUSE = 'TIMER_PAUSE'
+    CONNECTION_LOST = 'CONNECTION_LOST'
+    STOP = 'STOP'
 
 
 class LogicExtraction:
@@ -98,9 +98,12 @@ class LogicExtraction:
     border_pixels = 2
     titlebar_pixels = 30
 
-    def __init__(self, new_akk=False):
+    def __init__(self, new_akk):
         self.state = ExtractionState.START_INITIALIZING
-        self.new_akk = new_akk
+        if new_akk == "False":
+            self.new_akk = False
+        else:
+            self.new_akk = True
 
     def get_screen_position(self, pos):
         x = pos[0] + self.window_position[0] + self.border_pixels
@@ -672,7 +675,7 @@ class LogicExtraction:
             await asyncio.sleep(random.uniform(10, 15))
             self.state = ExtractionState.SHIP_IN_SPACE
 
-        elif self.state == ExtractionState.SHIP_IN_SPACE:  # !!!!!!!!!!!!!!!!!!!!!
+        elif self.state == ExtractionState.SHIP_IN_SPACE:
             task_1 = asyncio.create_task(self.shield_on_off())
             await task_1
             if self.ship_in_space:
@@ -972,6 +975,7 @@ class LogicExtraction:
         elif self.state == ExtractionState.LOCK_NPC:
             task_1 = asyncio.create_task(self.distance_calculation_npc())
             await task_1
+            await asyncio.sleep(random.uniform(1, 3))
 
             if task_1.result():
                 task_2 = asyncio.create_task(self.launch_drones())
@@ -980,7 +984,7 @@ class LogicExtraction:
                 await task_3
                 task_4 = asyncio.create_task(self.move_to_side_nearby_overview())
                 await task_4
-                await asyncio.sleep(random.uniform(4, 6))
+                await asyncio.sleep(random.uniform(3, 5))
                 self.state = ExtractionState.SCAN_SHIP_PRIME_LOCK_AND_SELECTED
             else:
                 self.state = ExtractionState.SCAN_DISTANCE_NPC

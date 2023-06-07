@@ -1,8 +1,8 @@
-from random import choice, randrange, randint
 import pytweening
 import numpy as np
 import pyautogui as pag
 from pyclick import HumanCurve
+from random import choice, randrange, randint
 
 
 class MouseUtils:
