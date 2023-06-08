@@ -1029,7 +1029,7 @@ class LogicExtraction:
                 self.state = ExtractionState.SCAN_SHIP_PRIME_LOCK_AND_SELECTED
 
         elif self.state == ExtractionState.TIMER_PAUSE:
-            if self.num_timer == 2:
+            if self.num_timer == 1:
                 task = asyncio.create_task(self.exit_program())
                 await task
             else:
