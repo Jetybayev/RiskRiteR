@@ -23,6 +23,7 @@ class IodineTelegram:
 
     state = None
     flag_docking = False
+    flag_timer = False
     pause = False
 
     screenshot = None
@@ -111,6 +112,9 @@ class IodineTelegram:
                 self.state = TelegramPause.ON
             else:
                 pass
+
+            if self.flag_timer == True:
+                continue
 
             if self.state == TelegramPause.OFF:
                 if self.window_position is not None:

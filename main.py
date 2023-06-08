@@ -47,7 +47,10 @@ class MainProgram:
                 pass
 
             if timer.state == TimeState.PAUSE:
+                tm_iodine.flag_timer = True
                 continue
+            else:
+                tm_iodine.flag_timer = False
 
             if timer.until_timer_end is not None and timer.until_timer_end < 1500:
                 print('Not enough time to fly')
